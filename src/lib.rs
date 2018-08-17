@@ -3,7 +3,7 @@ extern crate rand;
 use rand::{thread_rng, Rng};
 use std::fmt;
 
-enum Face {
+pub enum Face {
     Blank,   // Blank face
     Hammer,  // 1 Hammer face
     HammerP, // 1 Hammer+ face
@@ -43,34 +43,13 @@ impl fmt::Debug for Face {
     }
 }
 
-static FORTUNE_DICE: &'static [Face] = &[
-    Face::Blank,
-    Face::Hammer,
-    Face::Blank,
-    Face::Hammer,
-    Face::Blank,
-    Face::Eagle,
-];
+pub static FORTUNE_DICE: &'static [Face] = &[Face::Blank, Face::Hammer, Face::Blank, Face::Hammer, Face::Blank, Face::Eagle];
 
-static MISFORTUNE_DICE: &'static [Face] = &[
-    Face::Blade,
-    Face::Blank,
-    Face::Skull,
-    Face::Blank,
-    Face::Blade,
-    Face::Blank,
-];
+pub static MISFORTUNE_DICE: &'static [Face] = &[Face::Blade, Face::Blank, Face::Skull, Face::Blank, Face::Blade, Face::Blank];
 
-static EXPERTISE_DICE: &'static [Face] = &[
-    Face::HammerP,
-    Face::Eagle,
-    Face::Blank,
-    Face::Hammer,
-    Face::Comet,
-    Face::Eagle,
-];
+pub static EXPERTISE_DICE: &'static [Face] = &[Face::HammerP, Face::Eagle, Face::Blank, Face::Hammer, Face::Comet, Face::Eagle];
 
-static CHALLENGE_DICE: &'static [Face] = &[
+pub static CHALLENGE_DICE: &'static [Face] = &[
     Face::Blade,
     Face::Skull,
     Face::BladeD,
@@ -81,7 +60,7 @@ static CHALLENGE_DICE: &'static [Face] = &[
     Face::BladeD,
 ];
 
-static CHARACTERISTIC_DICE: &'static [Face] = &[
+pub static CHARACTERISTIC_DICE: &'static [Face] = &[
     Face::Eagle,
     Face::Hammer,
     Face::Blank,
@@ -92,7 +71,7 @@ static CHARACTERISTIC_DICE: &'static [Face] = &[
     Face::Hammer,
 ];
 
-static CONSERVATIVE_DICE: &'static [Face] = &[
+pub static CONSERVATIVE_DICE: &'static [Face] = &[
     Face::Hammer,
     Face::Eagle,
     Face::Hammer,
@@ -105,7 +84,7 @@ static CONSERVATIVE_DICE: &'static [Face] = &[
     Face::HammerW,
 ];
 
-static RECKLESS_DICE: &'static [Face] = &[
+pub static RECKLESS_DICE: &'static [Face] = &[
     Face::HammerE,
     Face::HammerD,
     Face::Blank,
@@ -118,7 +97,7 @@ static RECKLESS_DICE: &'static [Face] = &[
     Face::HammerD,
 ];
 
-pub fn roll_fortune() {
+pub fn roll(dice: &[Face]) -> &Face {
     let mut rng = thread_rng();
-    println!("{:?}", rng.choose(&FORTUNE_DICE));
+    return rng.choose(dice).unwrap_or(&Face::Blank);
 }

@@ -1,8 +1,9 @@
 extern crate wardice;
 
-use wardice::roll_fortune;
+use wardice::roll;
 
 fn main() {
     println!("Hello, wardice!");
-    roll_fortune();
+    let f = roll(wardice::FORTUNE_DICE);
+    println!("{:?}", f);
 }
