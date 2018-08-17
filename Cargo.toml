@@ -1,0 +1,6 @@
+[package]
+name = "wardice"
+version = "0.1.0"
+authors = ["Gasser Alain <a.gasser@elpev.com>"]
+
+[dependencies]
