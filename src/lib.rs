@@ -33,7 +33,7 @@ impl fmt::Debug for Dice {
         match &self {
             Dice::Fortune => write!(f, "Fortune"),
             Dice::Misfortune => write!(f, "Misfortune"),
-            Dice::Expertise => write!(f, "Exoertise"),
+            Dice::Expertise => write!(f, "Expertise"),
             Dice::Characteristic => write!(f, "Characteristic"),
             Dice::Challenge => write!(f, "Challenge"),
             Dice::Conservative => write!(f, "Conservative"),
@@ -164,15 +164,15 @@ fn roll(dice: &[Face]) -> &Face {
     };
 }
 
-fn roll_dice(dice: Dice) -> &'static Face {
+fn roll_dice(dice: Dice) -> (Dice, &'static Face) {
     match dice {
-        Dice::Fortune => roll(FORTUNE_DICE),
-        Dice::Misfortune => roll(MISFORTUNE_DICE),
-        Dice::Expertise => roll(EXPERTISE_DICE),
-        Dice::Characteristic => roll(CHARACTERISTIC_DICE),
-        Dice::Challenge => roll(CHALLENGE_DICE),
-        Dice::Conservative => roll(CONSERVATIVE_DICE),
-        Dice::Reckless => roll(RECKLESS_DICE),
+        Dice::Fortune => (Dice::Fortune, roll(FORTUNE_DICE)),
+        Dice::Misfortune => (Dice::Misfortune, roll(MISFORTUNE_DICE)),
+        Dice::Expertise => (Dice::Expertise, roll(EXPERTISE_DICE)),
+        Dice::Characteristic => (Dice::Characteristic, roll(CHARACTERISTIC_DICE)),
+        Dice::Challenge => (Dice::Challenge, roll(CHALLENGE_DICE)),
+        Dice::Conservative => (Dice::Conservative, roll(CONSERVATIVE_DICE)),
+        Dice::Reckless => (Dice::Reckless, roll(RECKLESS_DICE)),
     }
 }
 
@@ -185,6 +185,6 @@ fn roll_dice(dice: Dice) -> &'static Face {
 /// let resuls = roll_dices(dices);
 ///
 /// ```
-pub fn roll_dices(dices: Vec<Dice>) -> Vec<&'static Face> {
+pub fn roll_dices(dices: Vec<Dice>) -> Vec<(Dice, &'static Face)> {
     return dices.into_iter().map(roll_dice).collect();
 }
