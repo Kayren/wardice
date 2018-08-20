@@ -5,12 +5,17 @@
 
 //! Wardice crate
 
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate rand;
+extern crate serde_json;
 
 use rand::{thread_rng, Rng};
 use std::fmt;
 
 /// Represent all dice type available
+#[derive(Serialize, Deserialize)]
 pub enum Dice {
     /// Represent a Fortune dice
     Fortune,
@@ -43,7 +48,8 @@ impl fmt::Debug for Dice {
 }
 
 /// Represent all dice faces
-pub enum Face {
+#[derive(Serialize, Deserialize)]
+pub enum Face<'a> {
     /// Blank face
     Blank,
     /// 1 Hammer face
@@ -76,7 +82,7 @@ pub enum Face {
     Comet,
 }
 
-impl fmt::Debug for Face {
+impl<'a> fmt::Debug for Face<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self {
             Face::Blank => write!(f, "Blank"),
@@ -98,13 +104,13 @@ impl fmt::Debug for Face {
     }
 }
 
-static FORTUNE_DICE: &'static [Face] = &[Face::Blank, Face::Hammer, Face::Blank, Face::Hammer, Face::Blank, Face::Eagle];
+const FORTUNE_DICE: [Face; 6] = [Face::Blank, Face::Hammer, Face::Blank, Face::Hammer, Face::Blank, Face::Eagle];
 
-static MISFORTUNE_DICE: &'static [Face] = &[Face::Blade, Face::Blank, Face::Skull, Face::Blank, Face::Blade, Face::Blank];
+const MISFORTUNE_DICE: [Face; 6] = [Face::Blade, Face::Blank, Face::Skull, Face::Blank, Face::Blade, Face::Blank];
 
-static EXPERTISE_DICE: &'static [Face] = &[Face::HammerP, Face::Eagle, Face::Blank, Face::Hammer, Face::Comet, Face::Eagle];
+const EXPERTISE_DICE: [Face; 6] = [Face::HammerP, Face::Eagle, Face::Blank, Face::Hammer, Face::Comet, Face::Eagle];
 
-static CHALLENGE_DICE: &'static [Face] = &[
+const CHALLENGE_DICE: [Face; 8] = [
     Face::Blade,
     Face::Skull,
     Face::BladeD,
@@ -115,7 +121,7 @@ static CHALLENGE_DICE: &'static [Face] = &[
     Face::BladeD,
 ];
 
-static CHARACTERISTIC_DICE: &'static [Face] = &[
+const CHARACTERISTIC_DICE: [Face; 8] = [
     Face::Eagle,
     Face::Hammer,
     Face::Blank,
@@ -126,7 +132,7 @@ static CHARACTERISTIC_DICE: &'static [Face] = &[
     Face::Hammer,
 ];
 
-static CONSERVATIVE_DICE: &'static [Face] = &[
+const CONSERVATIVE_DICE: [Face; 10] = [
     Face::Hammer,
     Face::Eagle,
     Face::Hammer,
@@ -139,7 +145,7 @@ static CONSERVATIVE_DICE: &'static [Face] = &[
     Face::HammerW,
 ];
 
-static RECKLESS_DICE: &'static [Face] = &[
+const RECKLESS_DICE: [Face; 10] = [
     Face::HammerE,
     Face::HammerD,
     Face::Blank,
@@ -152,10 +158,23 @@ static RECKLESS_DICE: &'static [Face] = &[
     Face::HammerD,
 ];
 
-fn roll(dice: &[Face]) -> &Face {
+// Represent a roll result
+#[derive(Serialize, Deserialize)]
+struct DiceResult<'a> {
+    dice: Dice,
+    face: &'a Face,
+}
+
+impl<'a> fmt::Debug for DiceResult<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{{ dice: {:?}, face: {:?} }}", &self.dice, &self.face)
+    }
+}
+
+fn roll<'a>(dice: [Face; 6]) -> &'a Face {
     let mut rng = thread_rng();
 
-    return match rng.choose(dice) {
+    return match rng.choose(&dice) {
         Some(face) => face,
         None => {
             println!("roll_dice: some found return blank");
@@ -164,15 +183,36 @@ fn roll(dice: &[Face]) -> &Face {
     };
 }
 
-fn roll_dice(dice: Dice) -> (Dice, &'static Face) {
+fn roll_dice<'a>(dice: Dice) -> DiceResult<'a> {
     match dice {
-        Dice::Fortune => (Dice::Fortune, roll(FORTUNE_DICE)),
-        Dice::Misfortune => (Dice::Misfortune, roll(MISFORTUNE_DICE)),
-        Dice::Expertise => (Dice::Expertise, roll(EXPERTISE_DICE)),
-        Dice::Characteristic => (Dice::Characteristic, roll(CHARACTERISTIC_DICE)),
-        Dice::Challenge => (Dice::Challenge, roll(CHALLENGE_DICE)),
-        Dice::Conservative => (Dice::Conservative, roll(CONSERVATIVE_DICE)),
-        Dice::Reckless => (Dice::Reckless, roll(RECKLESS_DICE)),
+        Dice::Fortune => DiceResult {
+            dice: Dice::Fortune,
+            face: roll(FORTUNE_DICE),
+        },
+        Dice::Misfortune => DiceResult {
+            dice: Dice::Misfortune,
+            face: roll(MISFORTUNE_DICE),
+        },
+        Dice::Expertise => DiceResult {
+            dice: Dice::Expertise,
+            face: roll(EXPERTISE_DICE),
+        },
+        Dice::Characteristic => DiceResult {
+            dice: Dice::Characteristic,
+            face: roll(CHARACTERISTIC_DICE),
+        },
+        Dice::Challenge => DiceResult {
+            dice: Dice::Challenge,
+            face: roll(CHALLENGE_DICE),
+        },
+        Dice::Conservative => DiceResult {
+            dice: Dice::Conservative,
+            face: roll(CONSERVATIVE_DICE),
+        },
+        Dice::Reckless => DiceResult {
+            dice: Dice::Reckless,
+            face: roll(RECKLESS_DICE),
+        },
     }
 }
 
@@ -185,6 +225,6 @@ fn roll_dice(dice: Dice) -> (Dice, &'static Face) {
 /// let resuls = roll_dices(dices);
 ///
 /// ```
-pub fn roll_dices(dices: Vec<Dice>) -> Vec<(Dice, &'static Face)> {
+pub fn roll_dices<'a>(dices: Vec<Dice>) -> Vec<DiceResult<'a>> {
     return dices.into_iter().map(roll_dice).collect();
 }
