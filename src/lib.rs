@@ -5,12 +5,17 @@
 
 //! Wardice crate
 
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate rand;
+extern crate serde_json;
 
 use rand::{thread_rng, Rng};
 use std::fmt;
 
 /// Represent all dice type available
+#[derive(Serialize)]
 pub enum Dice {
     /// Represent a Fortune dice
     Fortune,
@@ -44,36 +49,60 @@ impl fmt::Debug for Dice {
 
 /// Represent all dice faces
 pub enum Face {
-    /// Blank face
+    /// Blank face => ""
     Blank,
-    /// 1 Hammer face
+    /// 1 Hammer face => "!"
     Hammer,
-    /// 1 Hammer+ face
+    /// 1 Hammer+ face => "#"
     HammerP,
-    /// 2 Hammers face
+    /// 2 Hammers face => "!!"
     HammerD,
-    /// 1 Hammer / Wait face
+    /// 1 Hammer / Wait face => "!("
     HammerW,
-    /// 1 Hammer / Eagle face
+    /// 1 Hammer / Eagle face => "!$"
     HammerE,
-    /// 1 Hammer / Tear face
+    /// 1 Hammer / Tear face => "!*"
     HammerT,
-    /// 1 Eagle face
+    /// 1 Eagle face => "$"
     Eagle,
-    /// 2 Eagles face
+    /// 2 Eagles face => "$$"
     EagleD,
-    /// 1 Skull face
+    /// 1 Skull face => "%"
     Skull,
-    /// 2 Skull face
+    /// 2 Skull face => "%%"
     SkullD,
-    /// 1 Blade face
+    /// 1 Blade face => "@"
     Blade,
-    /// 2 Blade face
+    /// 2 Blade face => "@@"
     BladeD,
-    /// Chaos face
+    /// Chaos face => "&"
     Chaos,
-    /// Comet face
+    /// Comet face => "^"
     Comet,
+}
+impl serde::Serialize for Face {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Face::Blank => serializer.serialize_str(""),
+            Face::Hammer => serializer.serialize_str("!"),
+            Face::HammerP => serializer.serialize_str("#"),
+            Face::HammerD => serializer.serialize_str("!!"),
+            Face::HammerW => serializer.serialize_str("!("),
+            Face::HammerE => serializer.serialize_str("!$"),
+            Face::HammerT => serializer.serialize_str("!*"),
+            Face::Eagle => serializer.serialize_str("$"),
+            Face::EagleD => serializer.serialize_str("$$"),
+            Face::Skull => serializer.serialize_str("%"),
+            Face::SkullD => serializer.serialize_str("%%"),
+            Face::Blade => serializer.serialize_str("@"),
+            Face::BladeD => serializer.serialize_str("@@"),
+            Face::Chaos => serializer.serialize_str("&"),
+            Face::Comet => serializer.serialize_str("^"),
+        }
+    }
 }
 
 impl fmt::Debug for Face {
