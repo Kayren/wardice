@@ -15,7 +15,7 @@ use rand::{thread_rng, Rng};
 use std::fmt;
 
 /// Represent all dice type available
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Copy)]
 pub enum Dice {
     /// Represent a Fortune dice
     Fortune,
@@ -48,6 +48,7 @@ impl fmt::Debug for Dice {
 }
 
 /// Represent all dice faces
+#[derive(Clone, Copy)]
 pub enum Face {
     /// Blank face => ""
     Blank,
@@ -205,6 +206,17 @@ fn roll_dice(dice: Dice) -> (Dice, &'static Face) {
     }
 }
 
+fn reroll_dice(l: &mut Vec<(Dice, &'static Face)>, roll: (Dice, &'static Face)) {
+    match roll.1 {
+        Face::HammerP => {
+            let r = roll_dice(roll.0);
+            l.push(r);
+            reroll_dice(l, r);
+        }
+        _ => (),
+    }
+}
+
 /// Roll dices.
 ///
 /// # Examples
@@ -215,5 +227,11 @@ fn roll_dice(dice: Dice) -> (Dice, &'static Face) {
 ///
 /// ```
 pub fn roll_dices(dices: Vec<Dice>) -> Vec<(Dice, &'static Face)> {
-    return dices.into_iter().map(roll_dice).collect();
+    let mut rolls: Vec<(Dice, &'static Face)> = dices.into_iter().map(roll_dice).collect();
+
+    let mut rerolls: Vec<(Dice, &'static Face)> = Vec::new();
+    rolls.clone().into_iter().map(|r| reroll_dice(&mut rerolls, r)).collect::<()>();
+
+    rolls.append(&mut rerolls);
+    rolls
 }
