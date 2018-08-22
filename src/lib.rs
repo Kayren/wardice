@@ -15,7 +15,7 @@ use rand::{thread_rng, Rng};
 use std::fmt;
 
 /// Represent all dice type available
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub enum Dice {
     /// Represent a Fortune dice
     Fortune,
